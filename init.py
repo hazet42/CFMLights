@@ -25,13 +25,15 @@ def ReadArgs(argv):
 # Read Location from Config File
 
 def ReadConfFile():
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read('CFMLights.cfg')
 
     loc_lon = config.getfloat('Location', 'Longitudinal')
     loc_lat = config.getfloat('Location', 'Latitudinal')
-    verboseprint("Configfile options: Location lon: ", loc_lon,", lat: ",loc_lat)
+    prog_num = config.getint('Programs', 'Startprogram')
+    pwm_freq = config.getint('Output', 'PWMFrequency')
 
+    return (loc_lon,loc_lat,prog_num,pwm_freq)
 
 # Enable verbosity:
 
