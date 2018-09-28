@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 #
 # Load libraries to directly access Raspberry's GPIO ports:
@@ -6,60 +6,20 @@
 import RPi.GPIO as GPIO
 import time
 import sys, getopt
-import ConfigParser
+import init
 
-# functions
-# Read Command line arguments
 
 def main(argv):
-   global verbose 
-   verbose = False
-   try:
-      opts, args = getopt.getopt(argv,"vh")
-   except getopt.GetoptError:
-      print 'sunlight.py -h to display options'
-      sys.exit(2)
-   for opt, arg in opts:
-       if opt == '-h':
-          print 'sunlight.py -v for verbosity'
-          sys.exit()
-       elif opt in ("-v"):
-          verbose = True
-
-
-if __name__ == "__main__":
-       main(sys.argv[1:])
-
-# Enable verbosity:
-if verbose :
-    def verboseprint(*args):
-        # Print each argument separately so caller doesn't need to
-        # stuff everything to be printed into a single string
-        for arg in args:
-           print arg,
-        print
-else:   
-   verboseprint = lambda *a: None      # do-nothing function
-
-
-# ---------------------------------------------------------------
-# Main
-
-
 # Read Location from Config File
 
-config = ConfigParser.RawConfigParser()
-config.read('CFMLights.cfg')
-
-loc_lon = config.getfloat('Location', 'Longitudinal')
-loc_lat = config.getfloat('Location', 'Latitudinal')
-verboseprint("Configfile options: Location lon: ", loc_lon,", lat: ",loc_lat)
+    init.ReadArgs(argv)
+    init.ReadConfFile
 
 
 # Set the GPIO outputs to be GPIO numbers (instead of board pin numbers):
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
 
 
 # Define GPIO Channels (mainly use the ones that do not have additional functionality):
@@ -72,32 +32,45 @@ GPIO.setwarnings(False)
 #   24... green
 #   25... blue
 #
-#   12... switch white
-#   13... switch color
+#   12... switch on-off
+#   13... switch sunlight-extralight
 
-GPIO.setup(5, GPIO.OUT)
-GPIO.setup(6, GPIO.OUT)
+    GPIO.setup(5, GPIO.OUT)
+    GPIO.setup(6, GPIO.OUT)
 
-GPIO.setup(23, GPIO.OUT)
-GPIO.setup(24, GPIO.OUT)
-GPIO.setup(25, GPIO.OUT)
+    GPIO.setup(23, GPIO.OUT)
+    GPIO.setup(24, GPIO.OUT)
+    GPIO.setup(25, GPIO.OUT)
 
-GPIO.setup(12, GPIO.IN,pull_up_down = GPIO.PUD_DOWN)
-GPIO.setup(13, GPIO.IN,pull_up_down = GPIO.PUD_DOWN)
- 
+    GPIO.setup(12, GPIO.IN,pull_up_down = GPIO.PUD_DOWN)
+    GPIO.setup(13, GPIO.IN,pull_up_down = GPIO.PUD_DOWN)
+     
+    red_led = GPIO.PWM(5,100)
+    red_led.start(0)
 
-# Test Routine: set on / off for 1 second:
 
-state = True
- 
-# endless loop, on/off for 1 second
-while True:
-	GPIO.output(5,True)
-	time.sleep(1)
-	GPIO.output(5,False)
-	time.sleep(1)
+# Test PWM 
+    while True:
+        pause_time = 0.010
+        for i in range(0,100+1):
+            red_led.ChangeDutyCycle(i)
+            time.sleep(pause_time)
+        for i in range(100,-1,-1):
+            red_led.ChangeDutyCycle(i)
+            time.sleep(pause_time)
+
+    GPIO.cleanup()
+
+#    GPIO.output(5,True)
+#    time.sleep(1)
+#    GPIO.output(5,False)
+#    time.sleep(1)
 
 
 # not much more yet...
 
-print "Hello World"
+    print("Hello World")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
