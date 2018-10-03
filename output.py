@@ -10,12 +10,11 @@ import RPi.GPIO as GPIO
 
 # Initialize GPIO Ports
 
-def init_gpio(pwm_freq):
+def init_gpio():
 # Set the GPIO outputs to be GPIO numbers (instead of board pin numbers):
 
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-
 
 # Define GPIO Channels (mainly use the ones that do not have additional functionality):
 # Inputs are pulled DOWN, so they expect 3.3V to be HIGH
@@ -23,9 +22,9 @@ def init_gpio(pwm_freq):
 #    5... warmwhite
 #    6... coldwhite
 #
-#   23... red
-#   24... green
-#   25... blue
+#   23... blue
+#   24... red
+#   25... green
 #
 #   12... switch on-off
 #   13... switch sunlight-extralight
@@ -40,25 +39,33 @@ def init_gpio(pwm_freq):
     GPIO.setup(12, GPIO.IN,pull_up_down = GPIO.PUD_DOWN)
     GPIO.setup(13, GPIO.IN,pull_up_down = GPIO.PUD_DOWN)
 
+
+
+def start_gpio_pwm(pwm_freq):
+# Start Pulse Width Modulation on Outputs
+
     ww = GPIO.PWM(5, pwm_freq)
     ww.start(0) 
 
     cw = GPIO.PWM(6, pwm_freq)
     cw.start(0) 
 
-    red = GPIO.PWM(23, pwm_freq)
+    red = GPIO.PWM(24, pwm_freq)
     red.start(0) 
 
-    green = GPIO.PWM(24, pwm_freq)
+    green = GPIO.PWM(25, pwm_freq)
     green.start(0) 
 
-    blue = GPIO.PWM(25, pwm_freq)
+    blue = GPIO.PWM(23, pwm_freq)
     blue.start(0) 
 
     return (ww,cw,red,green,blue)
 
 
-# Set GPIO Output
 
-#def setoutput(ww,cw,red,green,blue):
-    #nothing here yet
+def stop_gpio_pwm():
+    ww.stop()
+    cw.stop()
+    red.stop()
+    green.stop()
+    blue.stop()
