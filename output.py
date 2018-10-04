@@ -7,10 +7,13 @@
 
 import RPi.GPIO as GPIO
 
+import control
+
+
 
 # Initialize GPIO Ports
 
-def init_gpio():
+def init_gpio(pwm_freq):
 # Set the GPIO outputs to be GPIO numbers (instead of board pin numbers):
 
     GPIO.setmode(GPIO.BCM)
@@ -40,32 +43,53 @@ def init_gpio():
     GPIO.setup(13, GPIO.IN,pull_up_down = GPIO.PUD_DOWN)
 
 
-
-def start_gpio_pwm(pwm_freq):
-# Start Pulse Width Modulation on Outputs
-
     ww = GPIO.PWM(5, pwm_freq)
-    ww.start(0) 
-
     cw = GPIO.PWM(6, pwm_freq)
-    cw.start(0) 
-
     red = GPIO.PWM(24, pwm_freq)
-    red.start(0) 
-
     green = GPIO.PWM(25, pwm_freq)
-    green.start(0) 
-
     blue = GPIO.PWM(23, pwm_freq)
-    blue.start(0) 
 
     return (ww,cw,red,green,blue)
 
 
+def start_gpio_pwm(ww,cw,red,green,blue):
+# Start Pulse Width Modulation on Outputs
 
-def stop_gpio_pwm():
+    ww.start(0) 
+
+    cw.start(0) 
+
+    red.start(0) 
+
+    green.start(0) 
+
+    blue.start(0) 
+
+
+
+def stop_gpio_pwm(ww,cw,red,green,blue):
+# Stop Pulse Width Modulation
+
     ww.stop()
     cw.stop()
     red.stop()
     green.stop()
     blue.stop()
+
+
+
+def colors(ww,cw,red,green,blue,ww_c,cw_c,red_c,green_c,blue_c):
+#set color output
+
+    if control.extra_switch() == 1:
+        ww_c = 100*ww_c / (ww_c + cw_c)
+        cw_c = 100*cw_c / (ww_c + cw_c)
+        print(1)
+    else:
+        print(0)
+
+    ww.ChangeDutyCycle(ww_c)
+    cw.ChangeDutyCycle(cw_c)
+    red.ChangeDutyCycle(red_c)
+    green.ChangeDutyCycle(green_c)
+    blue.ChangeDutyCycle(blue_c)

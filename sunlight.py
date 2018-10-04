@@ -25,35 +25,39 @@ def main(argv):
     init.ReadArgs(argv)
     (loc_lon,loc_lat,prog_num,pwm_freq) = init.ReadConfFile()
 
+    pause_time = 0.10
 
     # Initialize GPIO-Ports
 
-    output.init_gpio()
-     
+    (ww,cw,red,green,blue) = output.init_gpio(pwm_freq)
 
 
     # Main Loop: run as long as onoff switch is set
 
     while True:
-        if control.onoff_switch:
+        if control.onoff_switch() == 1: 
             # Start PWM on outputs:
-            (ww,cw,red,green,blue) = output.start_gpio_pwm(pwm_freq)
+            output.start_gpio_pwm(ww,cw,red,green,blue)
+
+            while control.onoff_switch() == 1:
+                pause_time = 0.10
+            
+                output.colors(ww,cw,red,green,blue,10,0,0,0,60)
+
+                time.sleep(pause_time)
+        #        for i in range(0,100+1):
+        #            cw.ChangeDutyCycle(i)
+        #            ww.ChangeDutyCycle(100-i)
+        #            time.sleep(pause_time)
+        #        for i in range(100,-1,-1):
+        #           cw.ChangeDutyCycle(i)
+        #           ww.ChangeDutyCycle(100-i)
+
         else:
             # Stop PWM:
-            output.stop_gpio_pwm
+            output.stop_gpio_pwm(ww,cw,red,green,blue)
 
-        while control.onoff_switch:
-            pause_time = 0.010
-            green.ChangeDutyCycle(100)
-            ww.ChangeDutyCycle(20)
-    #        for i in range(0,100+1):
-    #            cw.ChangeDutyCycle(i)
-    #            ww.ChangeDutyCycle(100-i)
-    #            time.sleep(pause_time)
-    #        for i in range(100,-1,-1):
-    #           cw.ChangeDutyCycle(i)
-    #           ww.ChangeDutyCycle(100-i)
-            time.sleep(pause_time)
+        time.sleep(pause_time)
 
     GPIO.cleanup()
 
