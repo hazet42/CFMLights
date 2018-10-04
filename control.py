@@ -5,10 +5,17 @@
 
 # Import Systemwide libraries:
 
+import RPi.GPIO as GPIO
+
 # Import application modules:
 
 
 # for now (since hardware switches and web switch are not existend):
 
 def onoff_switch():
-    return True
+    onoff_state = GPIO.input(12)
+    return onoff_state
+
+def extra_switch():
+    extra_state = GPIO.input(13)
+    return extra_state
