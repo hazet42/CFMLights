@@ -6,7 +6,7 @@
 
 
 import RPi.GPIO as GPIO
-
+import time
 import control
 
 
@@ -49,26 +49,28 @@ def init_gpio(pwm_freq):
     green = GPIO.PWM(25, pwm_freq)
     blue = GPIO.PWM(23, pwm_freq)
 
-    return (ww,cw,red,green,blue)
+    gpio=(ww,cw,red,green,blue)
+
+    return (gpio)
 
 
-def start_gpio_pwm(ww,cw,red,green,blue):
+def start_gpio_pwm(gpio):
 # Start Pulse Width Modulation on Outputs
 
+    (ww,cw,red,green,blue)=gpio
+
     ww.start(0) 
-
     cw.start(0) 
-
     red.start(0) 
-
     green.start(0) 
-
     blue.start(0) 
 
 
 
-def stop_gpio_pwm(ww,cw,red,green,blue):
+def stop_gpio_pwm(gpio):
 # Stop Pulse Width Modulation
+
+    (ww,cw,red,green,blue)=gpio
 
     ww.stop()
     cw.stop()
@@ -77,16 +79,36 @@ def stop_gpio_pwm(ww,cw,red,green,blue):
     blue.stop()
 
 
+def fade_color(gpio,wcrgb_old,wcrgb):
 
-def colors(ww,cw,red,green,blue,ww_c,cw_c,red_c,green_c,blue_c):
+    (ww_c,cw_c,red_c,green_c,blue_c) = wcrgb
+    (ww_o,cw_o,red_o,green_o,blue_o) = wcrgb_old
+
+    #calculate step size to reach new colors after 100 steps:
+
+    ww_d = (ww_c - ww_o)/100
+    cw_d = (cw_c - cw_o)/100
+    red_d = (red_c - red_o)/100
+    green_d = (green_c - green_o)/100
+    blue_d = (blue_c - blue_o)/100
+
+
+    #cycle old to new:
+
+    for i in range (1,100):
+        wcrgb_i = [ww_o + i*ww_d, cw_o + i*cw_d, red_o + i*red_d, green_o + i*green_d, blue_o + i*blue_d]
+        colors(gpio,wcrgb_i)
+        time.sleep(0.01)
+
+    return (wcrgb)
+
+
+
+def colors(gpio,wcrgb):
 #set color output
 
-    if control.extra_switch() == 1:
-        ww_c = 100*ww_c / (ww_c + cw_c)
-        cw_c = 100*cw_c / (ww_c + cw_c)
-        print(1)
-    else:
-        print(0)
+    (ww,cw,red,green,blue)=gpio
+    (ww_c,cw_c,red_c,green_c,blue_c) = wcrgb
 
     ww.ChangeDutyCycle(ww_c)
     cw.ChangeDutyCycle(cw_c)

@@ -16,6 +16,7 @@ import logging
 import init
 import output
 import control
+import program
 
 def main(argv):
 # Read Location from Config File
@@ -29,7 +30,18 @@ def main(argv):
 
     # Initialize GPIO-Ports
 
-    (ww,cw,red,green,blue) = output.init_gpio(pwm_freq)
+    gpio = output.init_gpio(pwm_freq)
+
+
+    # Set Color Start Values
+
+    wcrgb_old = [0,0,0,0,0]
+    wcrgb = [0,0,0,0,0]
+
+
+    # Set Starting Program (TODO: should be read out of config-file - Issue 23)
+
+    prognr = 0 
 
 
     # Main Loop: run as long as onoff switch is set
@@ -37,12 +49,18 @@ def main(argv):
     while True:
         if control.onoff_switch() == 1: 
             # Start PWM on outputs:
-            output.start_gpio_pwm(ww,cw,red,green,blue)
+            output.start_gpio_pwm(gpio)
 
             while control.onoff_switch() == 1:
                 pause_time = 0.10
             
-                output.colors(ww,cw,red,green,blue,10,0,0,0,60)
+               
+                wcrgb = program.colors(prognr)
+                if control.extra_switch() == 1:
+                    wcrgb[0] = 100*wcrgb[0] / (wcrgb[0] + wcrgb[1])
+                    wcrgb[1] = 100*wcrgb[1] / (wcrgb[0] + wcrgb[1])
+
+                wcrgb_old = output.fade_color(gpio,wcrgb_old,wcrgb)
 
                 time.sleep(pause_time)
         #        for i in range(0,100+1):
@@ -55,7 +73,10 @@ def main(argv):
 
         else:
             # Stop PWM:
-            output.stop_gpio_pwm(ww,cw,red,green,blue)
+            wcrgb = [0,0,0,0,0]
+            wcrgb_old = output.fade_color(gpio,wcrgb_old,wcrgb)
+            wcrgb_old = [0,0,0,0,0]
+            output.stop_gpio_pwm(gpio)
 
         time.sleep(pause_time)
 
