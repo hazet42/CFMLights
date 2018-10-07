@@ -57,8 +57,11 @@ def main(argv):
                
                 wcrgb = program.colors(prognr)
                 if control.extra_switch() == 1:
-                    wcrgb[0] = 100*wcrgb[0] / (wcrgb[0] + wcrgb[1])
-                    wcrgb[1] = 100*wcrgb[1] / (wcrgb[0] + wcrgb[1])
+                    if wcrgb[0]+wcrgb[1] == 0:
+                        wcrgb[0] = 100
+                    else:
+                        wcrgb[0] = 100*wcrgb[0] / (wcrgb[0] + wcrgb[1])
+                        wcrgb[1] = 100*wcrgb[1] / (wcrgb[0] + wcrgb[1])
 
                 wcrgb_old = output.fade_color(gpio,wcrgb_old,wcrgb)
 
