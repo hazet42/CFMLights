@@ -41,7 +41,7 @@ def main(argv):
 
     # Set Starting Program (TODO: should be read out of config-file - Issue 23)
 
-    prognr = 0 
+    prognr = 2
 
 
     # Main Loop: run as long as onoff switch is set
@@ -55,7 +55,7 @@ def main(argv):
                 pause_time = 0.10
             
                
-                wcrgb = program.colors(prognr)
+                wcrgb = program.colors(prognr,loc_lon,loc_lat)
                 if control.extra_switch() == 1:
                     if wcrgb[0]+wcrgb[1] == 0:
                         wcrgb[0] = 100

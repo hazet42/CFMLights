@@ -95,7 +95,7 @@ def fade_color(gpio,wcrgb_old,wcrgb):
 
     #cycle old to new:
 
-    for i in range (1,100):
+    for i in range (0,100):
         wcrgb_i = [ww_o + i*ww_d, cw_o + i*cw_d, red_o + i*red_d, green_o + i*green_d, blue_o + i*blue_d]
         colors(gpio,wcrgb_i)
         time.sleep(0.01)
