@@ -1,6 +1,19 @@
 #!/usr/bin/python3
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 #
+# Main Module.
+# Control RGB + warm white + cold white LED chains in the living room
+# and pretend the color of the sun outside
+#
+# Uses a raspberry pi + external MosFET drivers to control the LEDs
+#
+# See hardware setup and wiring diagram in github's Wiki:
+#   https://github.com/hazet42/CFMLights/wiki
+#
+# (c) 2018 by Thomas Herzinger
+# Licensed under the GNU General Public License Version 3
+#
+#
 # Load libraries to directly access Raspberry's GPIO ports:
 
 # Import Systemwide libraries:
@@ -9,7 +22,7 @@ import RPi.GPIO as GPIO
 import time
 import sys, getopt
 import logging
-
+import math
 
 # Import application modules:
 
@@ -41,7 +54,7 @@ def main(argv):
 
     # Set Starting Program (TODO: should be read out of config-file - Issue 23)
 
-    prognr = 0 
+    prognr = 2
 
 
     # Main Loop: run as long as onoff switch is set
@@ -55,7 +68,7 @@ def main(argv):
                 pause_time = 0.10
             
                
-                wcrgb = program.colors(prognr)
+                wcrgb = program.colors(prognr,loc_lon,loc_lat)
                 if control.extra_switch() == 1:
                     if wcrgb[0]+wcrgb[1] == 0:
                         wcrgb[0] = 100
@@ -63,16 +76,17 @@ def main(argv):
                         wcrgb[0] = 100*wcrgb[0] / (wcrgb[0] + wcrgb[1])
                         wcrgb[1] = 100*wcrgb[1] / (wcrgb[0] + wcrgb[1])
 
-                wcrgb_old = output.fade_color(gpio,wcrgb_old,wcrgb)
+                
+                # only update PWM when changes are > 1:
+
+                diff = math.sqrt((wcrgb[0]-wcrgb_old[0])^2+(wcrgb[1]-wcrgb_old[1])^2
+                        +(wcrgb[2]-wcrgb_old[2])^2+(wcrgb[3]-wcrgb_old[3])^2
+                        +(wcrgb[4]-wcrgb_old[4])^2)
+
+                if diff > 1:
+                    wcrgb_old = output.fade_color(gpio,wcrgb_old,wcrgb)
 
                 time.sleep(pause_time)
-        #        for i in range(0,100+1):
-        #            cw.ChangeDutyCycle(i)
-        #            ww.ChangeDutyCycle(100-i)
-        #            time.sleep(pause_time)
-        #        for i in range(100,-1,-1):
-        #           cw.ChangeDutyCycle(i)
-        #           ww.ChangeDutyCycle(100-i)
 
         else:
             # Stop PWM:
