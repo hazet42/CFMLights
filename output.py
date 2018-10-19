@@ -100,6 +100,8 @@ def fade_color(gpio,wcrgb_old,wcrgb):
         colors(gpio,wcrgb_i)
         time.sleep(0.01)
 
+    colors(gpio,wcrgb)
+
     return (wcrgb)
 
 

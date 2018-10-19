@@ -69,7 +69,7 @@ def colors(prog_num,loc_lon,loc_lat):
         wcrgb = [0,0,100,0,0]
 
     elif prog_num == 1:
-        wcrgb = [10,0,0,0,100]
+        wcrgb = [50,50,50,50,100]
 
     elif prog_num == 2:
         # Simulate the radiation of the sun at position (loc_lon,loc_lat) at the time NOW
