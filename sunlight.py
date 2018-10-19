@@ -22,7 +22,6 @@ import RPi.GPIO as GPIO
 import time
 import sys, getopt
 import logging
-import math
 
 # Import application modules:
 
@@ -79,11 +78,13 @@ def main(argv):
                 
                 # only update PWM when changes are > 1:
 
-                diff = math.sqrt((wcrgb[0]-wcrgb_old[0])^2+(wcrgb[1]-wcrgb_old[1])^2
-                        +(wcrgb[2]-wcrgb_old[2])^2+(wcrgb[3]-wcrgb_old[3])^2
-                        +(wcrgb[4]-wcrgb_old[4])^2)
+#                print (wcrgb,wcrgb_old)
+                
+                diff = ((wcrgb[0]-wcrgb_old[0])**2+(wcrgb[1]-wcrgb_old[1])**2
+                        +(wcrgb[2]-wcrgb_old[2])**2+(wcrgb[3]-wcrgb_old[3])**2
+                        +(wcrgb[4]-wcrgb_old[4])**2)
 
-                if diff > 1:
+                if diff > 0:
                     wcrgb_old = output.fade_color(gpio,wcrgb_old,wcrgb)
 
                 time.sleep(pause_time)
