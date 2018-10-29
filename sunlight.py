@@ -64,7 +64,7 @@ def main(argv):
             output.start_gpio_pwm(gpio)
 
             while control.onoff_switch() == 1:
-                pause_time = 0.10
+                pause_time = 0.50
             
                
                 wcrgb = program.colors(prognr,loc_lon,loc_lat)
@@ -74,6 +74,7 @@ def main(argv):
                     else:
                         wcrgb[0] = 100*wcrgb[0] / (wcrgb[0] + wcrgb[1])
                         wcrgb[1] = 100*wcrgb[1] / (wcrgb[0] + wcrgb[1])
+
 
                 
                 # only update PWM when changes are > 1:
