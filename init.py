@@ -4,7 +4,7 @@ import sys, getopt
 import configparser
 
 
-global verbose
+global verbose,pwm_freq,pwm_mode
 verbose = False
 
 # Read CommandLineArguments
@@ -39,7 +39,7 @@ def ReadConfFile():
     # Read Output Parameters from config file and store in global variables
 
     globals()['pwm_freq'] = config.getint('Output', 'PWMFrequency')
-    globals()['pwm_mode'] = config.getint('Output', 'PWMMode')
+    globals()['pwm_mode'] = config.get('Output', 'PWMMode')
 
     return (loc_lon,loc_lat,prog_num)
 

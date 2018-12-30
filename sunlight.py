@@ -42,7 +42,7 @@ def main(argv):
 
     # Initialize GPIO-Ports or I2C bus depending on selected output-solution (HW / SW)
 
-    gpio = output.init_gpio(pwm_freq)
+    gpio = output.init_gpio(init.pwm_freq)
 
 
     # Set Color Start Values
@@ -81,7 +81,7 @@ def main(argv):
                         +(wcrgb[2]-wcrgb_old[2])**2+(wcrgb[3]-wcrgb_old[3])**2
                         +(wcrgb[4]-wcrgb_old[4])**2)
 
-                if diff > 0:
+                if diff > 1:
                     wcrgb_old = output.fade_color(gpio,wcrgb_old,wcrgb)
 
                 time.sleep(pause_time)
