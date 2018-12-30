@@ -14,7 +14,8 @@ import control
 import board
 import busio
 import adafruit_pca9685
-
+import init
+from math import log
 
 
 # Initialize GPIO Ports
@@ -34,7 +35,7 @@ def init_gpio(pwm_freq):
 #   24... red
 #   25... green
 
-    if pwm_mode == "SW":
+    if init.pwm_mode == "SW":
         GPIO.setup(5, GPIO.OUT)
         GPIO.setup(6, GPIO.OUT)
 
@@ -50,7 +51,7 @@ def init_gpio(pwm_freq):
 
 
 
-    elif pwm_mode == "HW":
+    elif init.pwm_mode == "HW":
         i2c = busio.I2C(board.SCL, board.SDA)
         hat = adafruit_pca9685.PCA9685(i2c)
         hat.frequency = pwm_freq
@@ -81,7 +82,7 @@ def start_gpio_pwm(gpio):
 
     (ww,cw,red,green,blue)=gpio
 
-    if pwm_mode == "SW":
+    if init.pwm_mode == "SW":
         ww.start(0) 
         cw.start(0) 
         red.start(0) 
@@ -95,12 +96,25 @@ def stop_gpio_pwm(gpio):
 
     (ww,cw,red,green,blue)=gpio
 
-    if pwm_mode == "SW":
+    if init.pwm_mode == "SW":
         ww.stop()
         cw.stop()
         red.stop()
         green.stop()
         blue.stop()
+
+
+def fade_stepsize(orig,diff,i):
+    #calculates a logarithmic step size for fading:
+    # i must be between 10 and 100
+
+    if diff < 0:
+        new = orig - (1-log(10-(i-10)/10,10)) * (-1) * diff
+    else:
+        new = orig + log (i/10,10) * diff
+
+    return (int(new))
+
 
 
 def fade_color(gpio,wcrgb_old,wcrgb):
@@ -110,19 +124,20 @@ def fade_color(gpio,wcrgb_old,wcrgb):
 
     #calculate step size to reach new colors after 100 steps:
 
-    ww_d = (ww_c - ww_o)/100
-    cw_d = (cw_c - cw_o)/100
-    red_d = (red_c - red_o)/100
-    green_d = (green_c - green_o)/100
-    blue_d = (blue_c - blue_o)/100
+    ww_d = (ww_c - ww_o)
+    cw_d = (cw_c - cw_o)
+    red_d = (red_c - red_o)
+    green_d = (green_c - green_o)
+    blue_d = (blue_c - blue_o)
 
 
     #cycle old to new:
 
-    for i in range (0,100):
-        wcrgb_i = [ww_o + i*ww_d, cw_o + i*cw_d, red_o + i*red_d, green_o + i*green_d, blue_o + i*blue_d]
+    for i in range (10,100):
+        wcrgb_i = [fade_stepsize(ww_o,ww_d,i),fade_stepsize(cw_o,cw_d,i),fade_stepsize(red_o,red_d,i),
+                fade_stepsize(green_o,green_d,i),fade_stepsize(blue_o,blue_d,i)]
         colors(gpio,wcrgb_i)
-        time.sleep(0.01)
+        time.sleep(0.005)
 
     colors(gpio,wcrgb)
 
@@ -136,7 +151,7 @@ def hexscale(color):
     # this function scales the percentage value (0 ... 100%) to this range
 
     colorhex = color/100*0xffff
-    return (colorhex)
+    return (int(colorhex))
 
 
 
@@ -146,14 +161,15 @@ def colors(gpio,wcrgb):
     (ww,cw,red,green,blue)=gpio
     (ww_c,cw_c,red_c,green_c,blue_c) = wcrgb
 
-    if pwm_mode == "HW":
+
+    if init.pwm_mode == "SW":
         ww.ChangeDutyCycle(ww_c)
         cw.ChangeDutyCycle(cw_c)
         red.ChangeDutyCycle(red_c)
         green.ChangeDutyCycle(green_c)
         blue.ChangeDutyCycle(blue_c)
 
-    elif pwm_mode == "SW":
+    elif init.pwm_mode == "HW":
         ww.duty_cycle = hexscale(ww_c)
         cw.duty_cycle = hexscale(cw_c)
         red.duty_cycle = hexscale(red_c)
