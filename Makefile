@@ -11,7 +11,9 @@ install: CFMlights
 	cp output.py $(DESTDIR)$(PREFIX)/bin/CFMlights
 	cp control.py $(DESTDIR)$(PREFIX)/bin/CFMlights
 	cp init.py $(DESTDIR)$(PREFIX)/bin/CFMlights
-	cp CFMLights.cfg $(DESTDIR)$(PREFIX)/bin/CFMlights
+	#
+	# Do not overwrite Config Files:
+	cp -n CFMLights.cfg $(DESTDIR)$(PREFIX)/bin/CFMlights
 	chown pi.pi $(DESTDIR)$(PREFIX)/bin/CFMlights/*.py
 	chown pi.pi $(DESTDIR)$(PREFIX)/bin/CFMlights/*.cfg
 	cp CFMlights.service /lib/systemd/system/

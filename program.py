@@ -27,12 +27,12 @@ def calc_color(loc_lat, loc_lon, date):
                 # pySolar cannot handle radiation for altitudes <= 0:
                 brightness = 0
             red = (altitude_deg+3)/4*10
-            green = red/4
+            green = red/10
             blue = (1-(altitude_deg+3)/4)*10
         elif altitude_deg<10:
             brightness = radiation.get_radiation_direct(date, altitude_deg)
             red = 10 + (altitude_deg-1)/9*90
-            green = red/3 
+            green = red/10 
             blue = 0
         elif altitude_deg < 15:
             brightness = radiation.get_radiation_direct(date, altitude_deg)

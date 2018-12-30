@@ -98,12 +98,17 @@ def fade_color(gpio,wcrgb_old,wcrgb):
     for i in range (0,100):
         wcrgb_i = [ww_o + i*ww_d, cw_o + i*cw_d, red_o + i*red_d, green_o + i*green_d, blue_o + i*blue_d]
         colors(gpio,wcrgb_i)
-        time.sleep(0.01)
+        time.sleep(0.04)
 
     colors(gpio,wcrgb)
 
     return (wcrgb)
 
+
+
+def antialias(color):
+    color_r = round(color,1)
+    return (color_r)
 
 
 def colors(gpio,wcrgb):
@@ -112,8 +117,8 @@ def colors(gpio,wcrgb):
     (ww,cw,red,green,blue)=gpio
     (ww_c,cw_c,red_c,green_c,blue_c) = wcrgb
 
-    ww.ChangeDutyCycle(ww_c)
-    cw.ChangeDutyCycle(cw_c)
-    red.ChangeDutyCycle(red_c)
-    green.ChangeDutyCycle(green_c)
-    blue.ChangeDutyCycle(blue_c)
+    ww.ChangeDutyCycle(antialias(ww_c))
+    cw.ChangeDutyCycle(antialias(cw_c))
+    red.ChangeDutyCycle(antialias(red_c))
+    green.ChangeDutyCycle(antialias(green_c))
+    blue.ChangeDutyCycle(antialias(blue_c))
