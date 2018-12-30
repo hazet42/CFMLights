@@ -36,11 +36,11 @@ def main(argv):
     logging.basicConfig(level=logging.INFO)
 
     init.ReadArgs(argv)
-    (loc_lon,loc_lat,prog_num,pwm_freq) = init.ReadConfFile()
+    (loc_lon,loc_lat,prognr) = init.ReadConfFile()
 
     pause_time = 0.10
 
-    # Initialize GPIO-Ports
+    # Initialize GPIO-Ports or I2C bus depending on selected output-solution (HW / SW)
 
     gpio = output.init_gpio(pwm_freq)
 
@@ -51,11 +51,6 @@ def main(argv):
     wcrgb = [0,0,0,0,0]
 
 
-    # Set Starting Program (TODO: should be read out of config-file - Issue 23)
-
-    prognr = 2
-
-
     # Main Loop: run as long as onoff switch is set
 
     while True:
@@ -64,10 +59,11 @@ def main(argv):
             output.start_gpio_pwm(gpio)
 
             while control.onoff_switch() == 1:
-                pause_time = 0.50
+                pause_time = 0.10
             
                
                 wcrgb = program.colors(prognr,loc_lon,loc_lat)
+
                 if control.extra_switch() == 1:
                     if wcrgb[0]+wcrgb[1] == 0:
                         wcrgb[0] = 100
