@@ -4,7 +4,7 @@ import sys, getopt
 import configparser
 
 
-global verbose
+global verbose,pwm_freq,pwm_mode
 verbose = False
 
 # Read CommandLineArguments
@@ -22,18 +22,26 @@ def ReadArgs(argv):
        elif opt in ("-v"):
           verbose = True
 
+
 # Read Location from Config File
 
 def ReadConfFile():
     config = configparser.RawConfigParser()
     config.read('CFMLights.cfg')
 
+    # Read Geo-Information and Standard-Program Number from Config File
+    
     loc_lon = config.getfloat('Location', 'Longitudinal')
     loc_lat = config.getfloat('Location', 'Latitudinal')
     prog_num = config.getint('Programs', 'Startprogram')
-    pwm_freq = config.getint('Output', 'PWMFrequency')
 
-    return (loc_lon,loc_lat,prog_num,pwm_freq)
+    
+    # Read Output Parameters from config file and store in global variables
+
+    globals()['pwm_freq'] = config.getint('Output', 'PWMFrequency')
+    globals()['pwm_mode'] = config.get('Output', 'PWMMode')
+
+    return (loc_lon,loc_lat,prog_num)
 
 # Enable verbosity:
 
